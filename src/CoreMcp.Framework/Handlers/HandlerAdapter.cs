@@ -1,11 +1,8 @@
 ﻿using CoreMcp.Protocol;
 using CoreMcp.Protocol.Messages;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Text.Json;
 
-namespace CoreMcp.Server.Handlers;
+namespace CoreMcp.Framework.Handlers;
 
 public sealed class HandlerAdapter<TRequest, TResult>
     : IHandlerAdapter

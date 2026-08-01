@@ -1,7 +1,8 @@
-﻿using CoreMcp.Protocol.Messages;
-using CoreMcp.Server.Handlers;
+﻿using CoreMcp.Framework.Dispatcher;
+using CoreMcp.Framework.Handlers;
+using CoreMcp.Protocol.Messages;
 
-namespace CoreMcp.Server.JsonRpc;
+namespace CoreMcp.Framework.Dispatcher;
 
 public sealed class JsonRpcDispatcher : IJsonRpcDispatcher
 {

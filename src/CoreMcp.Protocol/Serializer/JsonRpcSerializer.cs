@@ -4,7 +4,7 @@ namespace CoreMcp.Protocol.Serializer;
 
 public static class JsonRpcSerializer
 {
-    private static readonly JsonSerializerOptions Options = new()
+    public static readonly JsonSerializerOptions Options = new()
     {
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
         PropertyNameCaseInsensitive = true,
@@ -16,6 +16,11 @@ public static class JsonRpcSerializer
         return JsonSerializer.Deserialize<T>(
             payload.Span,
             Options)!;
+    }
+
+    public static T Deserialize<T>(JsonElement element)
+    {
+        return element.Deserialize<T>(Options)!;
     }
 
     public static ReadOnlyMemory<byte> Serialize<T>(T value)

@@ -1,6 +1,6 @@
 ﻿using CoreMcp.Protocol;
 
-namespace CoreMcp.Server.Handlers;
+namespace CoreMcp.Framework.Handlers;
 
 public interface IMcpMethodHandler<TRequest, TResult>
     where TRequest : IMcpRequest

@@ -1,7 +1,10 @@
 <Solution>
   <Folder Name="/src/">
+    <Project Path="src/CoreMcp.Framework/CoreMcp.Framework.csproj" Id="156d28ab-d09f-4f3d-bdb4-e6cffb5bce66" />
+    <Project Path="src/CoreMcp.Infrastructure/CoreMcp.Infrastructure.csproj" Id="1bbec3f3-f8ec-4b77-9407-8afd83dc4468" />
     <Project Path="src/CoreMcp.Protocol/CoreMcp.Protocol.csproj" />
     <Project Path="src/CoreMcp.Server/CoreMcp.Server.csproj" />
+    <Project Path="src/CoreMcp.Tools/CoreMcp.Tools.csproj" Id="ca56ee00-f2d0-4b40-a26d-2f022cc0a210" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/CoreMcp.Client/CoreMcp.Client.csproj" />

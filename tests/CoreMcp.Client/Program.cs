@@ -3,9 +3,9 @@ using CoreMcp.Protocol;
 using CoreMcp.Protocol.Initialize;
 using CoreMcp.Protocol.Messages;
 using CoreMcp.Protocol.Serializer;
+using CoreMcp.Protocol.Tools;
 using CoreMcp.Protocol.Transport;
 using System.Diagnostics;
-using System.Text;
 using System.Text.Json;
 
 var solutionRoot = SolutionLocator.FindSolutionRoot().FullName;
@@ -86,8 +86,36 @@ await transport.WriteMessageAsync(
     JsonRpcSerializer.Serialize(initialized));
 
 Console.WriteLine("Notification sent.");
-Console.WriteLine("Waiting 2 seconds...");
-
-await Task.Delay(2000);
-
 Console.WriteLine("No response received (expected).");
+
+var toolsList = new JsonRpcRequest
+{
+    JsonRpc = McpProtocol.JsonRpcVersion,
+    Id = JsonSerializer.SerializeToElement(3),
+    Method = "tools/list",
+    Parameters = JsonSerializer.SerializeToElement(new ToolsListRequest())
+};
+
+var toolsListResponse = await client.SendAsync(toolsList);
+
+Console.WriteLine(JsonSerializer.Serialize(toolsListResponse));
+
+var toolsCall = new JsonRpcRequest
+{
+    JsonRpc = McpProtocol.JsonRpcVersion,
+    Id = JsonSerializer.SerializeToElement(3),
+    Method = "tools/call",
+    Parameters = JsonSerializer.SerializeToElement(new CallToolRequest(
+        Name: "echo",
+        Arguments: JsonSerializer.SerializeToElement(new
+        {
+            message = "Hello MCP!"
+        })))
+};
+
+var toolsCallResponse = await client.SendAsync(toolsCall);
+
+Console.WriteLine(
+    JsonSerializer.Serialize(
+        toolsCallResponse,
+        JsonRpcSerializer.Options));

@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace CoreMcp.Server.JsonRpc;
+namespace CoreMcp.Framework.Dispatcher;
 
 public interface IJsonRpcDispatcher
 {

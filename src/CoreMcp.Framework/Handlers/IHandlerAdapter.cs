@@ -1,10 +1,7 @@
 ﻿using CoreMcp.Protocol;
 using CoreMcp.Protocol.Messages;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace CoreMcp.Server.Handlers;
+namespace CoreMcp.Framework.Handlers;
 
 public interface IHandlerAdapter
 {
