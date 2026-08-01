@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/CoreMcp.Protocol/CoreMcp.Protocol.csproj" />
+    <Project Path="src/CoreMcp.Server/CoreMcp.Server.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/CoreMcp.Client/CoreMcp.Client.csproj" />
+  </Folder>
+</Solution>
