@@ -28,10 +28,11 @@ public static class TextFileDetector
 
     public static bool IsTextFile(string path)
     {
-        var extension = Path.GetExtension(path);
+        return !FileSystemTextReader.IsBinary(path);
+    }
 
-        return !BinaryExtensions.Contains(
-            extension,
-            StringComparer.OrdinalIgnoreCase);
+    public static bool IsTextFile(FileInfo file)
+    {
+        return !FileSystemTextReader.IsBinary(file.FullName);
     }
 }
