@@ -5,7 +5,8 @@ namespace CoreMcp.Framework.Tools;
 
 public interface IToolAdapter
 {
-    ToolDefinition Definition { get; }
+    ToolDescriptor Definition { get; }
+    JsonElement InputSchema { get; }
 
     Task<CallToolResponse> ExecuteAsync(
         JsonElement arguments,

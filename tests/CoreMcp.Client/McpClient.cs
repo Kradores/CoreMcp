@@ -1,9 +1,6 @@
 ﻿using CoreMcp.Protocol.Messages;
 using CoreMcp.Protocol.Serializer;
 using CoreMcp.Protocol.Transport;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace CoreMcp.Client;
 
@@ -24,10 +21,15 @@ public sealed class McpClient
             JsonRpcSerializer.Serialize(request),
             cancellationToken);
 
-        var response =
-            await _transport.ReadMessageAsync(cancellationToken);
+        var payload = await _transport.ReadMessageAsync(cancellationToken);
+
+        if (payload is null)
+        {
+            throw new IOException(
+                "The MCP server closed the connection unexpectedly.");
+        }
 
         return JsonRpcSerializer.Deserialize<JsonRpcResponse>(
-            response!.Value);
+            payload.Value);
     }
 }

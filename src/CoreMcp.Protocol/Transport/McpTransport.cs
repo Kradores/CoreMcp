@@ -1,109 +1,57 @@
-﻿using System.Text;
+﻿using CoreMcp.Protocol.Transport.Framing;
+using System.Text;
 
 namespace CoreMcp.Protocol.Transport;
 
 public sealed class McpTransport
 {
-    private readonly Stream _input;
     private readonly Stream _output;
-    private readonly byte[] _singleByteBuffer = new byte[1];
+    private readonly BufferedBinaryReader _reader;
+    private readonly TransportFramerFactory _factory;
 
-    public McpTransport(Stream input, Stream output)
+    private ITransportFramer? _framer;
+
+    public McpTransport(
+    Stream output,
+    TransportFramerFactory factory,
+    BufferedBinaryReader reader)
     {
-        _input = input;
         _output = output;
-    }
-
-    public async Task WriteMessageAsync(
-        ReadOnlyMemory<byte> message,
-        CancellationToken cancellationToken = default)
-    {
-        var header =
-            $"Content-Length: {message.Length}\r\n\r\n";
-
-        var headerBytes = Encoding.ASCII.GetBytes(header);
-
-        await _output.WriteAsync(headerBytes, cancellationToken);
-        await _output.WriteAsync(message, cancellationToken);
-        await _output.FlushAsync(cancellationToken);
+        _factory = factory;
+        _reader = reader;
     }
 
     public async Task<ReadOnlyMemory<byte>?> ReadMessageAsync(
         CancellationToken cancellationToken = default)
     {
-        int? contentLength = null;
+        _framer ??= await _factory.DetectAsync(_reader, cancellationToken);
 
-        while (true)
-        {
-            var line = await ReadLineAsync(cancellationToken);
+        Console.Error.WriteLine($"[TRANSPORT] Using {_framer?.GetType().Name}");
 
-            if (line is null)
-                return null;
+        if (_framer is null)
+            return null;
 
-            if (line.Length == 0)
-                break;
+        Console.Error.WriteLine("[TRANSPORT] ReadMessageAsync");
 
-            if (line.StartsWith("Content-Length:", StringComparison.OrdinalIgnoreCase))
-            {
-                contentLength = int.Parse(
-                    line["Content-Length:".Length..].Trim());
-            }
-        }
+        var payload = await _framer.ReadMessageAsync(_reader, cancellationToken);
 
-        if (contentLength is null)
-            throw new InvalidOperationException(
-                "Missing Content-Length header.");
-
-        var payload = new byte[contentLength.Value];
-
-        var totalRead = 0;
-
-        while (totalRead < payload.Length)
-        {
-            var read = await _input.ReadAsync(
-                payload.AsMemory(totalRead),
-                cancellationToken);
-
-            if (read == 0)
-                throw new EndOfStreamException();
-
-            totalRead += read;
-        }
+        Console.Error.WriteLine(
+            $"[TRANSPORT] Payload length = {payload?.Length ?? -1}");
 
         return payload;
     }
 
-    private async Task<string?> ReadLineAsync(
-    CancellationToken cancellationToken)
+    public Task WriteMessageAsync(
+        ReadOnlyMemory<byte> payload,
+        CancellationToken cancellationToken = default)
     {
-        var bytes = new List<byte>();
+        if (_framer is null)
+            throw new InvalidOperationException(
+                "Cannot write before transport framing has been detected.");
 
-        while (true)
-        {
-            var buffer = _singleByteBuffer;
-
-            var read = await _input.ReadAsync(buffer, cancellationToken);
-
-            if (read == 0)
-            {
-                if (bytes.Count == 0)
-                    return null;
-
-                throw new EndOfStreamException();
-            }
-
-            bytes.Add(buffer[0]);
-
-            var count = bytes.Count;
-
-            if (count >= 2 &&
-                bytes[count - 2] == '\r' &&
-                bytes[count - 1] == '\n')
-            {
-                bytes.RemoveRange(count - 2, 2);
-
-                return Encoding.ASCII.GetString(bytes.ToArray());
-            }
-        }
+        return _framer.WriteMessageAsync(
+            _output,
+            payload,
+            cancellationToken);
     }
 }

@@ -11,4 +11,18 @@ public sealed class JsonRpcRequest : JsonRpcMessage
     [JsonPropertyName("params")]
     public JsonElement Parameters { get; init; }
     public bool IsNotification => Id is null;
+
+    public JsonElement ParametersOrEmpty
+    {
+        get
+        {
+            if (Parameters.ValueKind != JsonValueKind.Undefined)
+                return Parameters;
+
+            return EmptyObject;
+        }
+    }
+
+    private static readonly JsonElement EmptyObject =
+        JsonDocument.Parse("{}").RootElement.Clone();
 }

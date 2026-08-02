@@ -5,6 +5,8 @@ using CoreMcp.Protocol.Messages;
 using CoreMcp.Protocol.Serializer;
 using CoreMcp.Protocol.Tools;
 using CoreMcp.Protocol.Transport;
+using CoreMcp.Protocol.Transport.Framing;
+using CoreMcp.Tools.System.Drives;
 using System.Diagnostics;
 using System.Text.Json;
 
@@ -48,8 +50,9 @@ _ = Task.Run(async () =>
 });
 
 var transport = new McpTransport(
-    process.StandardOutput.BaseStream,
-    process.StandardInput.BaseStream);
+    process.StandardInput.BaseStream,
+    new TransportFramerFactory(new(), new()),
+    new BufferedBinaryReader(process.StandardOutput.BaseStream));
 
 var initialize = new InitializeRequest(
     McpProtocol.ProtocolVersion,
@@ -118,4 +121,22 @@ var toolsCallResponse = await client.SendAsync(toolsCall);
 Console.WriteLine(
     JsonSerializer.Serialize(
         toolsCallResponse,
+        JsonRpcSerializer.Options));
+
+var drives = new JsonRpcRequest
+{
+    JsonRpc = McpProtocol.JsonRpcVersion,
+    Id = JsonSerializer.SerializeToElement(4),
+    Method = "tools/call",
+    Parameters = JsonSerializer.SerializeToElement(
+        new CallToolRequest(
+            Name: "system_drives",
+            Arguments: JsonSerializer.SerializeToElement(new SystemDrivesArguments())))
+};
+
+var drivesResponse = await client.SendAsync(drives);
+
+Console.WriteLine(
+    JsonSerializer.Serialize(
+        drivesResponse,
         JsonRpcSerializer.Options));

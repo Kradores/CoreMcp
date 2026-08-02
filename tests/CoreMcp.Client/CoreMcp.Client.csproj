@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\CoreMcp.Protocol\CoreMcp.Protocol.csproj" />
+    <ProjectReference Include="..\..\src\CoreMcp.Tools\CoreMcp.Tools.csproj" />
   </ItemGroup>
 
 </Project>

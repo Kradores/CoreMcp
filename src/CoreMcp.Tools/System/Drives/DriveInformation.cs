@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿namespace CoreMcp.Tools.System.Drives;
 
-namespace CoreMcp.Tools.System.Drives;
-
-internal class DriveInformation
-{
-}
+public sealed record DriveInformation(
+    string Name,
+    long Used,
+    long Free);

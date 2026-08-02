@@ -2,6 +2,8 @@
 using CoreMcp.Protocol.Messages;
 using CoreMcp.Protocol.Serializer;
 using CoreMcp.Protocol.Transport;
+using CoreMcp.Server.ErrorHandling;
+using System.Text;
 
 namespace CoreMcp.Server;
 
@@ -16,34 +18,61 @@ public sealed class McpServer
         _dispatcher = dispatcher;
     }
 
-    public async Task RunAsync(
-        CancellationToken cancellationToken = default)
+    public async Task RunAsync(CancellationToken cancellationToken = default)
     {
         Console.Error.WriteLine("Server started.");
 
         while (!cancellationToken.IsCancellationRequested)
         {
-            var bytes = await _transport.ReadMessageAsync();
+            Console.Error.WriteLine("[SERVER] Waiting for message...");
 
-            if (bytes is null)
-            {
-                Console.Error.WriteLine("Client disconnected.");
-                return;
-            }
-
-            var request = JsonRpcSerializer.Deserialize<JsonRpcRequest>(bytes.Value);
+            var message = await _transport.ReadMessageAsync(cancellationToken);
 
             Console.Error.WriteLine(
-                $"Received '{request.Method}' " +
-                $"({(request.IsNotification ? "notification" : "request")})");
+                $"[SERVER] Message received: {message?.Length ?? -1} bytes");
 
-            var response = await _dispatcher.DispatchAsync(request, cancellationToken);
+            if (message is null)
+                break;
 
-            if (response is not null)
+            Console.Error.WriteLine($"Received {message.Value.Length} bytes");
+            Console.Error.WriteLine(Encoding.UTF8.GetString(message.Value.Span));
+
+            JsonRpcRequest? request = null;
+
+            try
             {
-                await _transport.WriteMessageAsync(
-                    JsonRpcSerializer.Serialize(response),
-                    cancellationToken);
+                request = JsonRpcSerializer
+                    .Deserialize<JsonRpcRequest>(message.Value);
+
+                Console.Error.WriteLine($"Received '{request.Method}'");
+
+                var response = await _dispatcher.DispatchAsync(request, cancellationToken);
+
+                if (response is null)
+                    continue;
+
+                var bytes = JsonRpcSerializer.Serialize(response);
+
+                Console.Error.WriteLine(Encoding.UTF8.GetString(bytes.Span));
+
+                await _transport.WriteMessageAsync(bytes);
+
+                Console.Error.WriteLine("[SERVER] Response sent.");
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine(ex);
+
+                if (request is { IsNotification: false })
+                {
+                    var response =
+                        JsonRpcExceptionMapper.Map(
+                            request,
+                            ex);
+
+                    await _transport.WriteMessageAsync(
+                        JsonRpcSerializer.Serialize(response));
+                }
             }
         }
     }

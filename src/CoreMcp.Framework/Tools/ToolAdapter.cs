@@ -1,4 +1,5 @@
-﻿using CoreMcp.Framework.Tools;
+﻿using CoreMcp.Framework.Reflection;
+using CoreMcp.Framework.Tools;
 using CoreMcp.Protocol.Serializer;
 using CoreMcp.Protocol.Tools;
 using System.Text.Json;
@@ -16,7 +17,9 @@ public sealed class ToolAdapter<TArguments>
         _tool = tool;
     }
 
-    public ToolDefinition Definition => _tool.Definition;
+    public ToolDescriptor Definition => _tool.Definition;
+
+    public JsonElement InputSchema => JsonSchemaGenerator.Generate(typeof(TArguments));
 
     public async Task<CallToolResponse> ExecuteAsync(
         JsonElement arguments,

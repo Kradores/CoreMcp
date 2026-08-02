@@ -1,33 +1,32 @@
-﻿using CoreMcp.Protocol.Tools;
+﻿using CoreMcp.Framework.Tools;
 
-namespace CoreMcp.Framework.Tools;
-
-public sealed class ToolRegistry
+public sealed class ToolRegistry : IToolRegistry
 {
     private readonly Dictionary<string, IToolAdapter> _tools;
-    private readonly IReadOnlyList<ToolDefinition> _definitions;
 
     public ToolRegistry(IEnumerable<IToolAdapter> tools)
     {
         _tools = tools.ToDictionary(
             t => t.Definition.Name,
             StringComparer.OrdinalIgnoreCase);
-
-        _definitions = _tools.Values
-            .Select(t => t.Definition)
-            .ToArray();
     }
 
-    public IReadOnlyList<ToolDefinition> Definitions => _definitions;
+    public IReadOnlyCollection<IToolAdapter> GetAll()
+        => _tools.Values;
+
+    public bool TryGetTool(
+        string name,
+        out IToolAdapter adapter)
+        => _tools.TryGetValue(name, out adapter!);
 
     public IToolAdapter GetRequiredTool(string name)
     {
-        if (!_tools.TryGetValue(name, out var tool))
+        if (TryGetTool(name, out var tool))
         {
-            throw new InvalidOperationException(
-                $"Tool '{name}' was not found.");
+            return tool;
         }
 
-        return tool;
+        throw new InvalidOperationException(
+            $"Tool '{name}' was not found.");
     }
 }

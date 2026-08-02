@@ -1,4 +1,7 @@
-﻿namespace CoreMcp.Protocol.Initialize;
+﻿using System.Text.Json.Serialization;
+
+namespace CoreMcp.Protocol.Initialize;
 
 public sealed record ToolCapabilities(
-bool? ListChanged = null);
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    bool? ListChanged = null);

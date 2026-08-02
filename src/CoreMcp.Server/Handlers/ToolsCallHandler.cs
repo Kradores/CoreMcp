@@ -7,10 +7,10 @@ namespace CoreMcp.Server.Handlers;
 public sealed class ToolsCallHandler
     : IMcpMethodHandler<CallToolRequest, CallToolResponse>
 {
-    private readonly ToolRegistry _toolRegistry;
+    private readonly IToolRegistry _toolRegistry;
 
     public ToolsCallHandler(
-        ToolRegistry toolRegistry)
+        IToolRegistry toolRegistry)
     {
         _toolRegistry = toolRegistry;
     }

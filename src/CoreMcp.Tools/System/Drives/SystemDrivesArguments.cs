@@ -4,6 +4,4 @@ using System.Text;
 
 namespace CoreMcp.Tools.System.Drives;
 
-internal class SystemDrivesArguments
-{
-}
+public sealed record SystemDrivesArguments;

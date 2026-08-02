@@ -7,10 +7,10 @@ namespace CoreMcp.Server.Handlers;
 public sealed class ToolsListHandler
     : IMcpMethodHandler<ToolsListRequest, ToolsListResponse>
 {
-    private readonly ToolRegistry _toolRegistry;
+    private readonly IToolRegistry _toolRegistry;
 
     public ToolsListHandler(
-        ToolRegistry toolRegistry)
+        IToolRegistry toolRegistry)
     {
         _toolRegistry = toolRegistry;
     }
@@ -22,7 +22,13 @@ public sealed class ToolsListHandler
         CancellationToken cancellationToken)
     {
         var response = new ToolsListResponse(
-            _toolRegistry.Definitions.ToList());
+            _toolRegistry.GetAll()
+                .Select(tool =>
+                    new ToolDefinition(
+                        tool.Definition.Name,
+                        tool.Definition.Description,
+                        tool.InputSchema))
+                .ToArray());
 
         return Task.FromResult(response);
     }
