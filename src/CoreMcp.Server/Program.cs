@@ -2,14 +2,17 @@
 using CoreMcp.Framework.Dispatcher;
 using CoreMcp.Framework.Tools;
 using CoreMcp.Infrastructure.Commands;
-using CoreMcp.Protocol;
 using CoreMcp.Protocol.Transport;
 using CoreMcp.Protocol.Transport.Framing;
 using CoreMcp.Server;
 using CoreMcp.Server.Handlers;
 using CoreMcp.Tools.Echo;
+using CoreMcp.Tools.FileSystem.Services;
+using CoreMcp.Tools.FileSystem.FsTree;
 using CoreMcp.Tools.System.Drives;
 using Microsoft.Extensions.DependencyInjection;
+using CoreMcp.Tools.FileSystem.FsRead;
+using CoreMcp.Tools.FileSystem.FsList;
 
 var services = new ServiceCollection();
 
@@ -38,8 +41,16 @@ services
     .AddMcpHandler<InitializedNotificationHandler>()
     .AddMcpHandler<ToolsListHandler>()
     .AddMcpHandler<ToolsCallHandler>()
+
     .AddMcpTool<EchoTool>()
-    .AddMcpTool<SystemDrivesTool>();
+    .AddMcpTool<SystemDrivesTool>()
+    .AddMcpTool<FsTreeTool>()
+    .AddMcpTool<FsReadTool>()
+    .AddMcpTool<FsListTool>();
+
+services.AddSingleton<FileTreeService>();
+services.AddSingleton<FileReadService>();
+services.AddSingleton<FileListService>();
 
 using var provider = services.BuildServiceProvider();
 
