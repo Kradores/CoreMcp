@@ -13,6 +13,7 @@ using CoreMcp.Tools.System.Drives;
 using Microsoft.Extensions.DependencyInjection;
 using CoreMcp.Tools.FileSystem.FsRead;
 using CoreMcp.Tools.FileSystem.FsList;
+using CoreMcp.Tools.FileSystem.FsGrep;
 
 var services = new ServiceCollection();
 
@@ -46,11 +47,13 @@ services
     .AddMcpTool<SystemDrivesTool>()
     .AddMcpTool<FsTreeTool>()
     .AddMcpTool<FsReadTool>()
-    .AddMcpTool<FsListTool>();
+    .AddMcpTool<FsListTool>()
+    .AddMcpTool<FsGrepTool>();
 
 services.AddSingleton<FileTreeService>();
 services.AddSingleton<FileReadService>();
 services.AddSingleton<FileListService>();
+services.AddSingleton<FileGrepService>();
 
 using var provider = services.BuildServiceProvider();
 

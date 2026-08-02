@@ -1,4 +1,6 @@
-﻿namespace CoreMcp.Tools.FileSystem.Internal;
+﻿using System.Text;
+
+namespace CoreMcp.Tools.FileSystem.Internal;
 
 internal static class FileSystemTextReader
 {
@@ -19,8 +21,13 @@ internal static class FileSystemTextReader
         return false;
     }
 
-    public static Task<string> ReadAllTextAsync()
+    public static async Task<string> ReadAllTextAsync(
+        string path,
+        CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        return await File.ReadAllTextAsync(
+            path,
+            Encoding.UTF8,
+            cancellationToken);
     }
 }
