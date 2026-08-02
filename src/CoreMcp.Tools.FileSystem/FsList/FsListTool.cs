@@ -20,11 +20,23 @@ public sealed class FsListTool
         Name: "fs_list",
         Description:
             """
-            Lists the immediate contents of a directory without recursion.
-            Returns the names of files and subdirectories contained directly within the specified folder.
-            Use this tool when you already know the directory and want to inspect its contents without traversing the entire project.
-            Prefer this tool over fs_tree when only a single directory needs to be examined.
-            Hidden, ignored and non-relevant directories such as build artifacts and dependency folders may be omitted automatically.
+            Lists only the immediate contents of a directory.
+            Prefer this tool over fs_tree when inspecting a single folder.
+            Do not use this tool for recursive exploration.
+
+            Examples:
+
+            User:
+            Find all Dockerfiles.
+
+            User:
+            Find Program.cs.
+
+            User:
+            Find every *.csproj.
+
+            User:
+            Find appsettings*.json.
             """);
 
     public async Task<CallToolResponse> ExecuteAsync(

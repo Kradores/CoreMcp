@@ -20,18 +20,16 @@ public sealed class FsTreeTool
     public ToolDescriptor Definition => new(
         Name: "fs_tree",
         Description: """
-        Builds a recursive directory tree for a local folder or project.
+        Recursively explores the directory structure of a project.
 
-        Use this tool FIRST when the user asks questions about:
-        - a software project
-        - source code
-        - repository structure
-        - folders or files
-        - "read this project"
-        - "analyze this repository"
-        - "understand this codebase"
+        Use this tool ONLY when you need an overview of an unfamiliar project.
 
-        The returned tree helps determine which files should be read next.
+        Do NOT use this tool to locate a known file or inspect a single directory.
+
+        Instead:
+        - use fs_search to find files by name or wildcard,
+        - use fs_list to inspect one directory,
+        - use fs_read to read file contents.
         """);
 
     public async Task<CallToolResponse> ExecuteAsync(
