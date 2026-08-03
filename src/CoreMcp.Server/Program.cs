@@ -14,6 +14,9 @@ using Microsoft.Extensions.DependencyInjection;
 using CoreMcp.Tools.FileSystem.FsRead;
 using CoreMcp.Tools.FileSystem.FsList;
 using CoreMcp.Tools.FileSystem.FsGrep;
+using CoreMcp.Tools.FileSystem.FsSearch;
+using CoreMcp.Tools.FileSystem.FsMetadata;
+using CoreMcp.Tools.FileSystem.FsWrite;
 
 var services = new ServiceCollection();
 
@@ -48,12 +51,18 @@ services
     .AddMcpTool<FsTreeTool>()
     .AddMcpTool<FsReadTool>()
     .AddMcpTool<FsListTool>()
-    .AddMcpTool<FsGrepTool>();
+    .AddMcpTool<FsGrepTool>()
+    .AddMcpTool<FsSearchTool>()
+    .AddMcpTool<FsMetadataTool>()
+    .AddMcpTool<FsWriteTool>();
 
 services.AddSingleton<FileTreeService>();
 services.AddSingleton<FileReadService>();
 services.AddSingleton<FileListService>();
 services.AddSingleton<FileGrepService>();
+services.AddSingleton<FileSearchService>();
+services.AddSingleton<FileMetadataService>();
+services.AddSingleton<FileWriteService>();
 
 using var provider = services.BuildServiceProvider();
 
