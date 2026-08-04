@@ -9,6 +9,7 @@
   <ItemGroup>
     <ProjectReference Include="..\CoreMcp.Framework\CoreMcp.Framework.csproj" />
     <ProjectReference Include="..\CoreMcp.Protocol\CoreMcp.Protocol.csproj" />
+    <PackageReference Include="PdfPig" Version="0.1.12" />
   </ItemGroup>
 
 </Project>

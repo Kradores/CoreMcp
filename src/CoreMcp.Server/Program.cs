@@ -23,6 +23,7 @@ using CoreMcp.Tools.FileSystem.FsCopy;
 using CoreMcp.Tools.FileSystem.FsDelete;
 using CoreMcp.Tools.FileSystem.FsPatch;
 using CoreMcp.Tools.FileSystem.Internal;
+using CoreMcp.Tools.FileSystem.FsPdfRead;
 
 var services = new ServiceCollection();
 
@@ -65,7 +66,8 @@ services
     .AddMcpTool<FsMoveTool>()
     .AddMcpTool<FsCopyTool>()
     .AddMcpTool<FsDeleteTool>()
-    .AddMcpTool<FsPatchTool>();
+    .AddMcpTool<FsPatchTool>()
+    .AddMcpTool<FsPdfReadTool>();
 
 services.AddSingleton<FileTreeService>();
 services.AddSingleton(FileSystemAccessPolicy.CreateDefault());
@@ -80,6 +82,7 @@ services.AddSingleton<FileMoveService>();
 services.AddSingleton<FileCopyService>();
 services.AddSingleton<FileDeleteService>();
 services.AddSingleton<FilePatchService>();
+services.AddSingleton<PdfReadService>();
 
 using var provider = services.BuildServiceProvider();
 
