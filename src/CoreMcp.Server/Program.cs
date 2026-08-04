@@ -21,6 +21,7 @@ using CoreMcp.Tools.FileSystem.FsMkdir;
 using CoreMcp.Tools.FileSystem.FsMove;
 using CoreMcp.Tools.FileSystem.FsCopy;
 using CoreMcp.Tools.FileSystem.FsDelete;
+using CoreMcp.Tools.FileSystem.FsPatch;
 
 var services = new ServiceCollection();
 
@@ -62,7 +63,8 @@ services
     .AddMcpTool<FsMkdirTool>()
     .AddMcpTool<FsMoveTool>()
     .AddMcpTool<FsCopyTool>()
-    .AddMcpTool<FsDeleteTool>();
+    .AddMcpTool<FsDeleteTool>()
+    .AddMcpTool<FsPatchTool>();
 
 services.AddSingleton<FileTreeService>();
 services.AddSingleton<FileReadService>();
@@ -75,6 +77,7 @@ services.AddSingleton<DirectoryCreateService>();
 services.AddSingleton<FileMoveService>();
 services.AddSingleton<FileCopyService>();
 services.AddSingleton<FileDeleteService>();
+services.AddSingleton<FilePatchService>();
 
 using var provider = services.BuildServiceProvider();
 
