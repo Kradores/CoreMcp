@@ -17,6 +17,7 @@ using CoreMcp.Tools.FileSystem.FsGrep;
 using CoreMcp.Tools.FileSystem.FsSearch;
 using CoreMcp.Tools.FileSystem.FsMetadata;
 using CoreMcp.Tools.FileSystem.FsWrite;
+using CoreMcp.Tools.FileSystem.FsMkdir;
 
 var services = new ServiceCollection();
 
@@ -54,7 +55,8 @@ services
     .AddMcpTool<FsGrepTool>()
     .AddMcpTool<FsSearchTool>()
     .AddMcpTool<FsMetadataTool>()
-    .AddMcpTool<FsWriteTool>();
+    .AddMcpTool<FsWriteTool>()
+    .AddMcpTool<FsMkdirTool>();
 
 services.AddSingleton<FileTreeService>();
 services.AddSingleton<FileReadService>();
@@ -63,6 +65,7 @@ services.AddSingleton<FileGrepService>();
 services.AddSingleton<FileSearchService>();
 services.AddSingleton<FileMetadataService>();
 services.AddSingleton<FileWriteService>();
+services.AddSingleton<DirectoryCreateService>();
 
 using var provider = services.BuildServiceProvider();
 
