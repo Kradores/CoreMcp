@@ -1,9 +1,17 @@
 using CoreMcp.Tools.FileSystem.FsMkdir;
+using CoreMcp.Tools.FileSystem.Internal;
 
 namespace CoreMcp.Tools.FileSystem.Services;
 
 public sealed class DirectoryCreateService
 {
+    private readonly FileSystemAccessPolicy _accessPolicy;
+
+    public DirectoryCreateService(FileSystemAccessPolicy accessPolicy)
+    {
+        _accessPolicy = accessPolicy;
+    }
+
     public Task<FsMkdirResult> CreateAsync(
         string path,
         CancellationToken cancellationToken = default)
@@ -11,7 +19,8 @@ public sealed class DirectoryCreateService
         ArgumentException.ThrowIfNullOrWhiteSpace(path);
         cancellationToken.ThrowIfCancellationRequested();
 
-        var fullPath = Path.GetFullPath(path);
+        var fullPath = _accessPolicy.Normalize(path);
+        _accessPolicy.EnsureMutationAllowed(fullPath);
 
         if (File.Exists(fullPath))
         {

@@ -6,6 +6,13 @@ namespace CoreMcp.Tools.FileSystem.Services;
 
 public sealed class FilePatchService
 {
+    private readonly FileSystemAccessPolicy _accessPolicy;
+
+    public FilePatchService(FileSystemAccessPolicy accessPolicy)
+    {
+        _accessPolicy = accessPolicy;
+    }
+
     public async Task<FsPatchResult> PatchAsync(
         string path,
         string oldText,
@@ -17,7 +24,8 @@ public sealed class FilePatchService
         ArgumentException.ThrowIfNullOrEmpty(oldText);
         ArgumentNullException.ThrowIfNull(newText);
 
-        var fullPath = Path.GetFullPath(path);
+        var fullPath = _accessPolicy.Normalize(path);
+        _accessPolicy.EnsureMutationAllowed(fullPath);
 
         if (!File.Exists(fullPath))
             throw new FileNotFoundException("The specified file does not exist.", fullPath);

@@ -1,9 +1,17 @@
 using CoreMcp.Tools.FileSystem.FsCopy;
+using CoreMcp.Tools.FileSystem.Internal;
 
 namespace CoreMcp.Tools.FileSystem.Services;
 
 public sealed class FileCopyService
 {
+    private readonly FileSystemAccessPolicy _accessPolicy;
+
+    public FileCopyService(FileSystemAccessPolicy accessPolicy)
+    {
+        _accessPolicy = accessPolicy;
+    }
+
     public Task<FsCopyResult> CopyAsync(
         string sourcePath,
         string destinationPath,
@@ -14,8 +22,9 @@ public sealed class FileCopyService
         ArgumentException.ThrowIfNullOrWhiteSpace(destinationPath);
         cancellationToken.ThrowIfCancellationRequested();
 
-        var sourceFullPath = Path.GetFullPath(sourcePath);
-        var destinationFullPath = Path.GetFullPath(destinationPath);
+        var sourceFullPath = _accessPolicy.Normalize(sourcePath);
+        var destinationFullPath = _accessPolicy.Normalize(destinationPath);
+        _accessPolicy.EnsureMutationAllowed(destinationFullPath);
 
         if (string.Equals(
                 sourceFullPath,

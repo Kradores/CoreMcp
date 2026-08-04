@@ -22,6 +22,7 @@ using CoreMcp.Tools.FileSystem.FsMove;
 using CoreMcp.Tools.FileSystem.FsCopy;
 using CoreMcp.Tools.FileSystem.FsDelete;
 using CoreMcp.Tools.FileSystem.FsPatch;
+using CoreMcp.Tools.FileSystem.Internal;
 
 var services = new ServiceCollection();
 
@@ -67,6 +68,7 @@ services
     .AddMcpTool<FsPatchTool>();
 
 services.AddSingleton<FileTreeService>();
+services.AddSingleton(FileSystemAccessPolicy.CreateDefault());
 services.AddSingleton<FileReadService>();
 services.AddSingleton<FileListService>();
 services.AddSingleton<FileGrepService>();

@@ -1,9 +1,17 @@
 using CoreMcp.Tools.FileSystem.FsDelete;
+using CoreMcp.Tools.FileSystem.Internal;
 
 namespace CoreMcp.Tools.FileSystem.Services;
 
 public sealed class FileDeleteService
 {
+    private readonly FileSystemAccessPolicy _accessPolicy;
+
+    public FileDeleteService(FileSystemAccessPolicy accessPolicy)
+    {
+        _accessPolicy = accessPolicy;
+    }
+
     public Task<FsDeleteResult> DeleteAsync(
         string path,
         bool recursive,
@@ -12,7 +20,8 @@ public sealed class FileDeleteService
         ArgumentException.ThrowIfNullOrWhiteSpace(path);
         cancellationToken.ThrowIfCancellationRequested();
 
-        var fullPath = Path.GetFullPath(path);
+        var fullPath = _accessPolicy.Normalize(path);
+        _accessPolicy.EnsureMutationAllowed(fullPath);
 
         if (File.Exists(fullPath))
         {

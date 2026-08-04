@@ -9,5 +9,6 @@
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/CoreMcp.Client/CoreMcp.Client.csproj" />
+    <Project Path="tests/CoreMcp.Tools.FileSystem.Tests/CoreMcp.Tools.FileSystem.Tests.csproj" />
   </Folder>
 </Solution>

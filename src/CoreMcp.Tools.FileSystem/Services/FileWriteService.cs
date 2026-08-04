@@ -1,10 +1,18 @@
 using System.Text;
 using CoreMcp.Tools.FileSystem.FsWrite;
+using CoreMcp.Tools.FileSystem.Internal;
 
 namespace CoreMcp.Tools.FileSystem.Services;
 
 public sealed class FileWriteService
 {
+    private readonly FileSystemAccessPolicy _accessPolicy;
+
+    public FileWriteService(FileSystemAccessPolicy accessPolicy)
+    {
+        _accessPolicy = accessPolicy;
+    }
+
     public async Task<FsWriteResult> WriteAsync(
         string path,
         string content,
@@ -14,7 +22,8 @@ public sealed class FileWriteService
         ArgumentException.ThrowIfNullOrWhiteSpace(path);
         ArgumentNullException.ThrowIfNull(content);
 
-        var fullPath = Path.GetFullPath(path);
+        var fullPath = _accessPolicy.Normalize(path);
+        _accessPolicy.EnsureMutationAllowed(fullPath);
         var parentPath = Path.GetDirectoryName(fullPath);
 
         if (string.IsNullOrEmpty(parentPath) || !Directory.Exists(parentPath))

@@ -1,9 +1,17 @@
 using CoreMcp.Tools.FileSystem.FsMove;
+using CoreMcp.Tools.FileSystem.Internal;
 
 namespace CoreMcp.Tools.FileSystem.Services;
 
 public sealed class FileMoveService
 {
+    private readonly FileSystemAccessPolicy _accessPolicy;
+
+    public FileMoveService(FileSystemAccessPolicy accessPolicy)
+    {
+        _accessPolicy = accessPolicy;
+    }
+
     public Task<FsMoveResult> MoveAsync(
         string sourcePath,
         string destinationPath,
@@ -14,8 +22,10 @@ public sealed class FileMoveService
         ArgumentException.ThrowIfNullOrWhiteSpace(destinationPath);
         cancellationToken.ThrowIfCancellationRequested();
 
-        var sourceFullPath = Path.GetFullPath(sourcePath);
-        var destinationFullPath = Path.GetFullPath(destinationPath);
+        var sourceFullPath = _accessPolicy.Normalize(sourcePath);
+        var destinationFullPath = _accessPolicy.Normalize(destinationPath);
+        _accessPolicy.EnsureMutationAllowed(sourceFullPath);
+        _accessPolicy.EnsureMutationAllowed(destinationFullPath);
 
         if (string.Equals(
                 sourceFullPath,
