@@ -24,6 +24,9 @@ using CoreMcp.Tools.FileSystem.FsDelete;
 using CoreMcp.Tools.FileSystem.FsPatch;
 using CoreMcp.Tools.FileSystem.Internal;
 using CoreMcp.Tools.FileSystem.FsPdfRead;
+using CoreMcp.Tools.Transcript;
+using CoreMcp.Tools.Transcript.TranscriptsReadConversation;
+using CoreMcp.Tools.Transcript.TranscriptsSearch;
 
 var services = new ServiceCollection();
 
@@ -67,7 +70,9 @@ services
     .AddMcpTool<FsCopyTool>()
     .AddMcpTool<FsDeleteTool>()
     .AddMcpTool<FsPatchTool>()
-    .AddMcpTool<FsPdfReadTool>();
+    .AddMcpTool<FsPdfReadTool>()
+    .AddMcpTool<TranscriptsSearchTool>()
+    .AddMcpTool<TranscriptsReadConversationTool>();
 
 services.AddSingleton<FileTreeService>();
 services.AddSingleton(FileSystemAccessPolicy.CreateDefault());
@@ -83,8 +88,16 @@ services.AddSingleton<FileCopyService>();
 services.AddSingleton<FileDeleteService>();
 services.AddSingleton<FilePatchService>();
 services.AddSingleton<PdfReadService>();
+services.AddSingleton(TranscriptDatabaseOptions.FromEnvironment());
+services.AddSingleton<TranscriptRepository>();
 
 using var provider = services.BuildServiceProvider();
+
+var transcriptOptions = provider.GetRequiredService<TranscriptDatabaseOptions>();
+if (!string.IsNullOrWhiteSpace(transcriptOptions.ConnectionString))
+{
+    await provider.GetRequiredService<TranscriptRepository>().ValidateAsync();
+}
 
 var server = provider.GetRequiredService<McpServer>();
 

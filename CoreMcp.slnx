@@ -6,9 +6,11 @@
     <Project Path="src/CoreMcp.Server/CoreMcp.Server.csproj" />
     <Project Path="src/CoreMcp.Tools.FileSystem/CoreMcp.Tools.FileSystem.csproj" Id="f51439ae-1a25-42ed-859a-77dada574fe2" />
     <Project Path="src/CoreMcp.Tools/CoreMcp.Tools.csproj" Id="ca56ee00-f2d0-4b40-a26d-2f022cc0a210" />
+    <Project Path="src/CoreMcp.Tools.Transcript/CoreMcp.Tools.Transcript.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/CoreMcp.Client/CoreMcp.Client.csproj" />
     <Project Path="tests/CoreMcp.Tools.FileSystem.Tests/CoreMcp.Tools.FileSystem.Tests.csproj" />
+    <Project Path="tests/CoreMcp.Tools.Transcript.Tests/CoreMcp.Tools.Transcript.Tests.csproj" />
   </Folder>
 </Solution>
