@@ -94,7 +94,7 @@ public sealed class TranscriptRepositoryTests : IDisposable
     }
 
     [Fact]
-    public async Task Reports_a_missing_fts_index_without_exposing_connection_data()
+    public async Task Provisions_a_missing_fts_index_for_an_empty_database()
     {
         var path = Path.Combine(Path.GetTempPath(), $"CoreMcp.NoFts.{Guid.NewGuid():N}.db");
 
@@ -112,11 +112,8 @@ public sealed class TranscriptRepositoryTests : IDisposable
             var repository = new TranscriptRepository(
                 new TranscriptDatabaseOptions($"Data Source={path};Pooling=False"));
 
-            var exception = await Assert.ThrowsAsync<InvalidOperationException>(() =>
-                repository.SearchAsync(new TranscriptsSearchArguments()));
-
-            Assert.Contains("transcripts_fts", exception.Message);
-            Assert.DoesNotContain(path, exception.Message);
+            var result = await repository.SearchAsync(new TranscriptsSearchArguments());
+            Assert.Empty(result.Conversations);
         }
         finally
         {

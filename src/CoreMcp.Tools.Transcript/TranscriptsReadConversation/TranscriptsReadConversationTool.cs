@@ -30,15 +30,27 @@ public sealed class TranscriptsReadConversationTool
         TranscriptsReadConversationArguments arguments,
         CancellationToken cancellationToken)
     {
-        var result = await _repository.ReadConversationAsync(
-            arguments,
-            cancellationToken);
+        try
+        {
+            var result = await _repository.ReadConversationAsync(
+                arguments,
+                cancellationToken);
 
-        return new CallToolResponse(
-        [
-            new TextContent(JsonSerializer.Serialize(
-                result,
-                JsonRpcSerializer.Options))
-        ]);
+            return new CallToolResponse(
+            [
+                new TextContent(JsonSerializer.Serialize(
+                    result,
+                    JsonRpcSerializer.Options))
+            ]);
+        }
+        catch (TranscriptDatabaseUnavailableException error)
+        {
+            return new CallToolResponse([new TextContent(error.Message)], IsError: true);
+        }
+        catch (Microsoft.Data.Sqlite.SqliteException error)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            return new CallToolResponse([new TextContent(TranscriptDatabaseUnavailableException.FromSqlite(error).Message)], IsError: true);
+        }
     }
 }

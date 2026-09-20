@@ -1,10 +1,8 @@
--- Run this script once against the transcript SQLite database before enabling
--- the MCP transcript tools. The server connects read-only and only validates
--- that these objects exist.
+-- Embedded and executed by CoreMcp inside a repair transaction only when needed.
 CREATE VIRTUAL TABLE IF NOT EXISTS transcripts_fts
 USING fts5(text, content = 'transcripts', content_rowid = 'rowid');
 
-INSERT INTO transcripts_fts(transcripts_fts) VALUES ('rebuild');
+
 
 CREATE TRIGGER IF NOT EXISTS transcripts_fts_after_insert
 AFTER INSERT ON transcripts BEGIN
@@ -23,3 +21,5 @@ AFTER UPDATE OF text ON transcripts BEGIN
     VALUES ('delete', old.rowid, old.text);
     INSERT INTO transcripts_fts(rowid, text) VALUES (new.rowid, new.text);
 END;
+
+INSERT INTO transcripts_fts(transcripts_fts) VALUES ('rebuild');

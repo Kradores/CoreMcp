@@ -1,4 +1,4 @@
-﻿using CoreMcp.Framework.DependencyInjection;
+using CoreMcp.Framework.DependencyInjection;
 using CoreMcp.Framework.Dispatcher;
 using CoreMcp.Framework.Tools;
 using CoreMcp.Infrastructure.Commands;
@@ -92,12 +92,6 @@ services.AddSingleton(TranscriptDatabaseOptions.FromEnvironment());
 services.AddSingleton<TranscriptRepository>();
 
 using var provider = services.BuildServiceProvider();
-
-var transcriptOptions = provider.GetRequiredService<TranscriptDatabaseOptions>();
-if (!string.IsNullOrWhiteSpace(transcriptOptions.ConnectionString))
-{
-    await provider.GetRequiredService<TranscriptRepository>().ValidateAsync();
-}
 
 var server = provider.GetRequiredService<McpServer>();
 

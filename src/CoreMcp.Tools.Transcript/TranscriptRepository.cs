@@ -16,17 +16,11 @@ public sealed class TranscriptRepository
     private const int DefaultMaxCharacters = 20_000;
     private const int MaxMaxCharacters = 50_000;
     private static readonly TimeSpan ConversationGap = TimeSpan.FromMinutes(5);
-    private static readonly string[] RequiredColumns =
-    [
-        "created_at", "source", "start_time", "end_time", "language",
-        "confidence", "text"
-    ];
-
-    private readonly TranscriptDatabaseOptions _options;
+    private readonly TranscriptDatabaseInitializer _initializer;
 
     public TranscriptRepository(TranscriptDatabaseOptions options)
     {
-        _options = options;
+        _initializer = new TranscriptDatabaseInitializer(options);
     }
 
     public async Task ValidateAsync(CancellationToken cancellationToken = default)
@@ -136,93 +130,8 @@ public sealed class TranscriptRepository
             NextCursor: nextCursor);
     }
 
-    private async Task<SqliteConnection> OpenValidatedConnectionAsync(
-        CancellationToken cancellationToken)
-    {
-        if (string.IsNullOrWhiteSpace(_options.ConnectionString))
-        {
-            throw new InvalidOperationException(
-                $"Set {TranscriptDatabaseOptions.ConnectionStringEnvironmentVariable} " +
-                "to a SQLite transcript database connection string.");
-        }
-
-        var builder = new SqliteConnectionStringBuilder(_options.ConnectionString)
-        {
-            Mode = SqliteOpenMode.ReadOnly
-        };
-
-        var connection = new SqliteConnection(builder.ToString());
-
-        try
-        {
-            await connection.OpenAsync(cancellationToken);
-            await ValidateSchemaAsync(connection, cancellationToken);
-            return connection;
-        }
-        catch
-        {
-            await connection.DisposeAsync();
-            throw;
-        }
-    }
-
-    private static async Task ValidateSchemaAsync(
-        SqliteConnection connection,
-        CancellationToken cancellationToken)
-    {
-        await EnsureObjectExistsAsync(
-            connection,
-            "transcripts",
-            cancellationToken);
-        await EnsureObjectExistsAsync(
-            connection,
-            "transcripts_fts",
-            cancellationToken);
-
-        var columns = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-        await using var command = connection.CreateCommand();
-        command.CommandText = "PRAGMA table_info(transcripts);";
-
-        await using var reader = await command.ExecuteReaderAsync(cancellationToken);
-        while (await reader.ReadAsync(cancellationToken))
-            columns.Add(reader.GetString(1));
-
-        var missing = RequiredColumns
-            .Where(column => !columns.Contains(column))
-            .ToArray();
-
-        if (missing.Length > 0)
-        {
-            throw new InvalidOperationException(
-                "The transcripts table is missing required columns: " +
-                string.Join(", ", missing) + ".");
-        }
-
-        await using var rowIdCommand = connection.CreateCommand();
-        rowIdCommand.CommandText = "SELECT rowid FROM transcripts LIMIT 0;";
-        await rowIdCommand.ExecuteNonQueryAsync(cancellationToken);
-    }
-
-    private static async Task EnsureObjectExistsAsync(
-        SqliteConnection connection,
-        string name,
-        CancellationToken cancellationToken)
-    {
-        await using var command = connection.CreateCommand();
-        command.CommandText =
-            "SELECT 1 FROM sqlite_master WHERE name = $name LIMIT 1;";
-        command.Parameters.AddWithValue("$name", name);
-
-        var exists = await command.ExecuteScalarAsync(cancellationToken);
-
-        if (exists is null)
-        {
-            throw new InvalidOperationException(
-                name == "transcripts_fts"
-                    ? "The transcripts_fts FTS5 index is missing. Run Sql/transcripts-fts5.sql against the transcript database."
-                    : "The transcripts table is missing.");
-        }
-    }
+    private Task<SqliteConnection> OpenValidatedConnectionAsync(CancellationToken cancellationToken) =>
+        _initializer.OpenAsync(cancellationToken);
 
     private static async Task<IReadOnlyList<StoredTranscript>> FindAnchorsAsync(
         SqliteConnection connection,
